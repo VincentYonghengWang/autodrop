@@ -1,0 +1,57 @@
+from datetime import datetime
+
+from pydantic import BaseModel
+
+
+class MetricCard(BaseModel):
+    title: str
+    value: str
+    delta: str
+    tone: str
+
+
+class PipelineStage(BaseModel):
+    name: str
+    count: int
+    detail: str
+
+
+class ProductRow(BaseModel):
+    id: int
+    product_name: str
+    source: str
+    margin: float
+    status: str
+    channels: list[str]
+    factory_hint: dict | None
+    created_at: datetime
+
+
+class ActivityItem(BaseModel):
+    robot_name: str
+    message: str
+    status: str
+    created_at: datetime
+
+
+class ExceptionItem(BaseModel):
+    id: int
+    type: str
+    description: str
+    status: str
+    severity: str
+    created_at: datetime
+
+
+class DashboardResponse(BaseModel):
+    metrics: list[MetricCard]
+    pipeline: list[PipelineStage]
+    products: list[ProductRow]
+    activity: list[ActivityItem]
+    exceptions: list[ExceptionItem]
+
+
+class TriggerResponse(BaseModel):
+    task_name: str
+    status: str
+
