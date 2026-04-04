@@ -1,6 +1,6 @@
 # AutoDrop
 
-AutoDrop is a demo-first dropshipping command center built for fast hackathon storytelling:
+AutoDrop is a dropshipping command center built for fast hackathon storytelling:
 
 - trend detection
 - product scouting
@@ -8,7 +8,7 @@ AutoDrop is a demo-first dropshipping command center built for fast hackathon st
 - storefront publishing
 - simulated checkout, routing, and analytics
 
-## Fast local demo
+## Fast local setup
 
 1. Create and activate a virtual environment.
 2. Install backend dependencies.
@@ -36,12 +36,12 @@ Open:
 - API docs: `http://localhost:8000/docs`
 - App UI: `http://localhost:5173`
 
-## Demo flow
+## App flow
 
 1. Open `Owner UI`
-2. Click `Launch Demo Loop`
+2. Click `Launch Automation`
 3. Open `Customer UI`
-4. Click `Buy demo product`
+4. Click `Buy featured product`
 5. Switch back to `Owner UI` and show the new sale, routing, and updated metrics
 
 ## Tests

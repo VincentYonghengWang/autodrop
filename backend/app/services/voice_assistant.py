@@ -18,7 +18,7 @@ def _format_product(product: ProductCandidate, signal: TrendSignal | None) -> st
 
 
 def build_voice_reply(question: str, db: Session) -> dict:
-    products = db.scalars(select(ProductCandidate).order_by(ProductCandidate.created_at.desc()).limit(8)).all()
+    products = db.scalars(select(ProductCandidate).order_by(ProductCandidate.created_at.desc()).limit(12)).all()
     lowered = question.lower()
 
     matched = None
@@ -39,7 +39,7 @@ def build_voice_reply(question: str, db: Session) -> dict:
             answer = "Right now we do not have a winner flagged, but we are actively testing products from the live catalog."
     elif "shipping" in lowered or "delivery" in lowered:
         answer = (
-            "For the demo store, products ship from verified factory partners in China, "
+            "Products ship from verified factory partners in China, "
             "and we present them as 7 to 14 day delivery items with automated routing."
         )
     else:

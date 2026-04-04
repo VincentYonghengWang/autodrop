@@ -69,13 +69,144 @@ const FALLBACK_STOREFRONT: StorefrontResponse = {
       subtitle: "Spotted on TikTok Shop cool devices · Fulfilled by Spocket",
       image_tone: "mint",
     },
+    {
+      id: 2,
+      product_name: "Portable Ice Plunge Tub",
+      source: "tiktok",
+      status: "winner",
+      price: 129,
+      compare_at_price: 179,
+      margin: 0.31,
+      channels: ["shopify", "instagram", "tiktok_shop"],
+      factory_hint: null,
+      badge: "Best seller",
+      subtitle: "Spotted on TikTok · Fulfilled by CJ Dropshipping",
+      image_tone: "sky",
+    },
+    {
+      id: 3,
+      product_name: "LED Jellyfish Desk Lamp",
+      source: "douyin",
+      status: "publishing",
+      price: 29,
+      compare_at_price: 43.5,
+      margin: 0.27,
+      channels: ["shopify", "youtube", "tiktok_shop"],
+      factory_hint: { city: "深圳", category: "electronics", factory_count: 140 },
+      badge: "Launching",
+      subtitle: "Spotted on Douyin · Sourced via Shenzhen factory cluster",
+      image_tone: "lavender",
+    },
+    {
+      id: 4,
+      product_name: "Pet Hair Remover Roller",
+      source: "amazon",
+      status: "live",
+      price: 50.25,
+      compare_at_price: 75.38,
+      margin: 0.29,
+      channels: ["shopify", "amazon", "instagram"],
+      factory_hint: null,
+      badge: "Live now",
+      subtitle: "Spotted on Amazon · Fulfilled by CJ Dropshipping",
+      image_tone: "peach",
+    },
+    {
+      id: 5,
+      product_name: "Foldable Walking Pad",
+      source: "tiktok",
+      status: "testing",
+      price: 289,
+      compare_at_price: 389,
+      margin: 0.23,
+      channels: ["shopify", "tiktok_shop"],
+      factory_hint: null,
+      badge: "Trending",
+      subtitle: "Spotted on TikTok · Fulfilled by Zendrop",
+      image_tone: "mint",
+    },
+    {
+      id: 6,
+      product_name: "Magnetic Cable Organizer",
+      source: "instagram",
+      status: "publishing",
+      price: 18,
+      compare_at_price: 27,
+      margin: 0.26,
+      channels: ["shopify", "amazon", "tiktok_shop"],
+      factory_hint: null,
+      badge: "Launching",
+      subtitle: "Spotted on Instagram · Fulfilled by AliExpress Fast Ship",
+      image_tone: "peach",
+    },
+    {
+      id: 7,
+      product_name: "Portable Blender Bottle",
+      source: "tiktok",
+      status: "live",
+      price: 28,
+      compare_at_price: 39,
+      margin: 0.25,
+      channels: ["shopify", "instagram", "tiktok_shop"],
+      factory_hint: null,
+      badge: "Live now",
+      subtitle: "Spotted on TikTok · Fulfilled by CJ Dropshipping",
+      image_tone: "mint",
+    },
+    {
+      id: 8,
+      product_name: "Sunset Projection Lamp",
+      source: "amazon",
+      status: "testing",
+      price: 24,
+      compare_at_price: 36,
+      margin: 0.28,
+      channels: ["shopify", "amazon", "instagram"],
+      factory_hint: null,
+      badge: "Trending",
+      subtitle: "Spotted on Amazon · Fulfilled by Guangzhou Lighting Hub",
+      image_tone: "lavender",
+    },
+    {
+      id: 9,
+      product_name: "Breathable Slip-On Recovery Shoes",
+      source: "douyin",
+      status: "live",
+      price: 49,
+      compare_at_price: 72,
+      margin: 0.27,
+      channels: ["shopify", "amazon", "tiktok_shop"],
+      factory_hint: { city: "莆田", category: "shoes", factory_count: 260 },
+      badge: "Live now",
+      subtitle: "Spotted on Douyin · Sourced via Putian factory cluster",
+      image_tone: "sky",
+    },
+    {
+      id: 10,
+      product_name: "Car Seat Gap Organizer",
+      source: "instagram",
+      status: "publishing",
+      price: 22,
+      compare_at_price: 33,
+      margin: 0.24,
+      channels: ["shopify", "amazon"],
+      factory_hint: null,
+      badge: "Launching",
+      subtitle: "Spotted on Instagram · Fulfilled by Zendrop",
+      image_tone: "peach",
+    },
   ],
-  total_products: 1,
+  influencer_cards: [
+    { platform: "TikTok", handle: "@nova.picks", title: "Rechargeable Neck Fan test in real heat", stats: "2.3M views · 187K likes · 4.2K comments", theme: "obsidian" },
+    { platform: "Instagram", handle: "@lux.styled", title: "Cooling gadget reel for summer commuters", stats: "1.1M views · 94K likes · 2.1K saves", theme: "forest" },
+    { platform: "YouTube Shorts", handle: "@vida.finds", title: "Best practical under-$35 buy this week", stats: "840K views · 61K likes · 3.8K comments", theme: "mahogany" },
+  ],
+  total_products: 10,
   updated_label: "Preview data loaded",
 };
 
-const INFLUENCER_CARDS = [
-  { platform: "TikTok", handle: "@nova.ai", title: "Rechargeable Neck Fan test in real heat", stats: "2.3M views · 187K likes · 4.2K comments", theme: "obsidian" },
+const FALLBACK_INFLUENCER_CARDS = [
+  { platform: "TikTok", handle: "@nova.picks", title: "Rechargeable Neck Fan test in real heat", stats: "2.3M views · 187K likes · 4.2K comments", theme: "obsidian" },
   { platform: "Instagram", handle: "@lux.styled", title: "Cooling gadget reel for summer commuters", stats: "1.1M views · 94K likes · 2.1K saves", theme: "forest" },
   { platform: "YouTube Shorts", handle: "@vida.finds", title: "Best practical under-$35 buy this week", stats: "840K views · 61K likes · 3.8K comments", theme: "mahogany" },
 ];
@@ -92,6 +223,11 @@ type TriggerTask = "trend-radar" | "price-engine" | "douyin-intel" | "analytics-
 const LIVE_SYNC_INTERVAL_MS = 3000;
 
 type CartProduct = StorefrontResponse["products"][number];
+type CartLine = {
+  product: CartProduct;
+  quantity: number;
+};
+type CheckoutStep = "cart" | "checkout";
 
 type CheckoutForm = {
   email: string;
@@ -140,57 +276,81 @@ type VoiceMessage = {
   text: string;
 };
 
+type ActiveVideoCard = {
+  title: string;
+  platform: string;
+  handle: string;
+  videoUrl: string;
+};
+
 function svgDataUri(svg: string): string {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function getFallbackProductImage(productName: string): string {
+  const key = productName.toLowerCase();
+  if (key.includes("walking pad")) {
+    return "/products/foldable-walking-pad.jpg";
+  }
+  if (key.includes("cable organizer")) {
+    return "/products/magnetic-cable-organizer.jpg";
+  }
+  if (key.includes("blender bottle")) {
+    return "/products/portable-blender-bottle.jpg";
+  }
+  if (key.includes("sunset projection lamp")) {
+    return "/products/sunset-projection-lamp.jpg";
+  }
+  if (key.includes("recovery shoes")) {
+    return "/products/breathable-slip-on-recovery-shoes.jpg";
+  }
+  if (key.includes("car seat gap organizer")) {
+    return "/products/car-seat-gap-organizer.jpg";
+  }
+  return "/products/portable-blender-bottle.jpg";
 }
 
 function getProductImage(productName: string): string {
   const key = productName.toLowerCase();
   if (key.includes("pet hair remover")) {
-    return "https://petsroller.net/cdn/shop/files/AuR0Thd1OnPAhAfIVrAx.webp?v=1726161015&width=1946";
+    return "/products/pet-hair-remover-roller.webp";
   }
   if (key.includes("neck fan")) {
-    return "https://www.panergy.com/cdn/shop/files/HF340-Black-1.png?v=1699562288&width=416";
+    return "/products/rechargeable-neck-fan.png";
   }
   if (key.includes("jellyfish")) {
-    return "https://lampjellyfish.com/cdn/shop/products/S0d63bc229c144e6699a271b1f4e44795e_8a32fe28-1dc8-4593-b109-21460576c91a.jpg?v=1656311825&width=1946";
+    return "/products/led-jellyfish-desk-lamp.jpg";
   }
   if (key.includes("ice plunge")) {
-    return "https://plunge.com/cdn/shop/files/Pop-Up-Tub-Only-Main.jpg?v=1765577086&width=1024";
+    return "/products/portable-ice-plunge-tub.jpg";
   }
   if (key.includes("walking pad")) {
-    return svgDataUri(`
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
-        <rect width="800" height="600" rx="32" fill="#eff0ea"/>
-        <rect x="160" y="280" width="480" height="110" rx="40" fill="#2f3136"/>
-        <rect x="192" y="302" width="416" height="66" rx="28" fill="#595c63"/>
-        <circle cx="238" cy="335" r="26" fill="#131417"/>
-        <circle cx="562" cy="335" r="26" fill="#131417"/>
-        <text x="400" y="96" text-anchor="middle" font-family="Arial" font-size="34" fill="#656a59">Foldable Walking Pad</text>
-      </svg>
-    `);
+    return "/products/foldable-walking-pad.jpg";
   }
   if (key.includes("cable organizer")) {
-    return svgDataUri(`
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
-        <rect width="800" height="600" rx="32" fill="#f1ece6"/>
-        <rect x="245" y="200" width="310" height="180" rx="34" fill="#fefefe" stroke="#d6cabf" stroke-width="8"/>
-        <rect x="300" y="245" width="54" height="90" rx="22" fill="#50545e"/>
-        <rect x="373" y="245" width="54" height="90" rx="22" fill="#50545e"/>
-        <rect x="446" y="245" width="54" height="90" rx="22" fill="#50545e"/>
-        <path d="M327 335v74M400 335v96M473 335v64" stroke="#7f868f" stroke-width="10" stroke-linecap="round"/>
-        <text x="400" y="96" text-anchor="middle" font-family="Arial" font-size="34" fill="#7c6c5f">Magnetic Cable Organizer</text>
-      </svg>
-    `);
+    return "/products/magnetic-cable-organizer.jpg";
   }
-  return svgDataUri(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
-      <rect width="800" height="600" rx="32" fill="#f3eee7"/>
-      <rect x="220" y="150" width="360" height="300" rx="48" fill="#ffffff" stroke="#dfd2c5" stroke-width="8"/>
-      <circle cx="400" cy="300" r="84" fill="#ead8c5"/>
-      <text x="400" y="94" text-anchor="middle" font-family="Arial" font-size="34" fill="#7b6f63">AutoDrop Product</text>
-    </svg>
-  `);
+  if (key.includes("blender bottle")) {
+    return "/products/portable-blender-bottle.jpg";
+  }
+  if (key.includes("sunset projection lamp")) {
+    return "/products/sunset-projection-lamp.jpg";
+  }
+  if (key.includes("recovery shoes")) {
+    return "/products/breathable-slip-on-recovery-shoes.jpg";
+  }
+  if (key.includes("car seat gap organizer")) {
+    return "/products/car-seat-gap-organizer.jpg";
+  }
+  return "/products/portable-blender-bottle.jpg";
+}
+
+function handleProductImageError(event: React.SyntheticEvent<HTMLImageElement>) {
+  const fallback = getFallbackProductImage(event.currentTarget.alt || "");
+  if (event.currentTarget.src !== fallback) {
+    event.currentTarget.onerror = null;
+    event.currentTarget.src = fallback;
+  }
 }
 
 function getCreatorImage(index: number): string {
@@ -200,6 +360,15 @@ function getCreatorImage(index: number): string {
     "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=900&q=80",
   ];
   return images[index % images.length];
+}
+
+function getInfluencerVideo(index: number): string {
+  const videos = [
+    "https://samplelib.com/lib/preview/mp4/sample-5s.mp4",
+    "https://samplelib.com/lib/preview/mp4/sample-10s.mp4",
+    "https://samplelib.com/lib/preview/mp4/sample-15s.mp4",
+  ];
+  return videos[index % videos.length];
 }
 
 function sleep(ms: number): Promise<void> {
@@ -223,13 +392,13 @@ export default function App() {
   const [activeTask, setActiveTask] = useState<string | null>(null);
   const [mode, setMode] = useState<ViewMode>("owner");
   const [usingPreviewData, setUsingPreviewData] = useState(false);
-  const [checkoutState, setCheckoutState] = useState<CheckoutResponse | null>(null);
-  const [cartItems, setCartItems] = useState<CartProduct[]>([]);
+  const [checkoutState, setCheckoutState] = useState<CheckoutResponse[]>([]);
+  const [cartItems, setCartItems] = useState<CartLine[]>([]);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [selectedCheckoutProduct, setSelectedCheckoutProduct] = useState<CartProduct | null>(null);
+  const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>("cart");
   const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>({
-    email: "demo-buyer@example.com",
-    fullName: "Demo Buyer",
+    email: "buyer@example.com",
+    fullName: "AutoDrop Buyer",
     address1: "1 Market Street",
     city: "San Francisco",
     state: "CA",
@@ -242,11 +411,17 @@ export default function App() {
   const [workflowSteps, setWorkflowSteps] = useState<WorkflowStep[]>([]);
   const [workflowEvents, setWorkflowEvents] = useState<WorkflowEvent[]>([]);
   const [voiceOpen, setVoiceOpen] = useState(false);
+  const [activeVideoCard, setActiveVideoCard] = useState<ActiveVideoCard | null>(null);
   const [voiceMessages, setVoiceMessages] = useState<VoiceMessage[]>([
     { speaker: "assistant", text: "Hi, I can answer questions about pricing, trend sources, margins, and shipping for the products in this store." },
   ]);
   const [voiceInput, setVoiceInput] = useState("");
   const [voiceListening, setVoiceListening] = useState(false);
+  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const cartSubtotal = cartItems.reduce((total, item) => total + item.product.price * item.quantity, 0);
+  const shippingTotal = cartSubtotal > 35 || cartSubtotal === 0 ? 0 : 6.99;
+  const taxTotal = Number((cartSubtotal * 0.08).toFixed(2));
+  const orderTotal = cartSubtotal + shippingTotal + taxTotal;
 
   function pushWorkflowEvent(message: string, tone: "info" | "success" = "info") {
     setWorkflowEvents((current) => [
@@ -352,30 +527,45 @@ export default function App() {
     }
   }
 
-  async function handleCheckout(productId: number) {
+  function addToCart(productId: number, nextStep: CheckoutStep = "cart") {
     const selected = storefront.products.find((product) => product.id === productId) ?? null;
     if (!selected) {
       return;
     }
-    setCartItems([selected]);
-    setSelectedCheckoutProduct(selected);
+    setCartItems((current) => {
+      const existing = current.find((item) => item.product.id === selected.id);
+      if (existing) {
+        return current.map((item) =>
+          item.product.id === selected.id ? { ...item, quantity: item.quantity + 1 } : item,
+        );
+      }
+      return [...current, { product: selected, quantity: 1 }];
+    });
+    setCheckoutStep(nextStep);
     setCheckoutOpen(true);
   }
 
   async function submitCheckout() {
-    if (!selectedCheckoutProduct) {
+    if (cartItems.length === 0) {
       return;
     }
     try {
-      setActiveTask(`checkout-${selectedCheckoutProduct.id}`);
-      const result = await submitCheckoutRequest(selectedCheckoutProduct.id, checkoutForm.email);
-      setCheckoutState(result);
+      setActiveTask("checkout-cart");
+      const results: CheckoutResponse[] = [];
+      for (const line of cartItems) {
+        for (let quantity = 0; quantity < line.quantity; quantity += 1) {
+          const result = await submitCheckoutRequest(line.product.id, checkoutForm.email);
+          results.push(result);
+        }
+      }
+      setCheckoutState(results);
       setCartItems([]);
+      setCheckoutStep("cart");
       setCheckoutOpen(false);
       await loadData();
       setMode("owner");
     } catch {
-      setCheckoutState(null);
+      setCheckoutState([]);
     } finally {
       setActiveTask(null);
     }
@@ -383,6 +573,19 @@ export default function App() {
 
   function updateCheckoutField(field: keyof CheckoutForm, value: string) {
     setCheckoutForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateCartQuantity(productId: number, nextQuantity: number) {
+    setCartItems((current) =>
+      current
+        .map((item) => (item.product.id === productId ? { ...item, quantity: nextQuantity } : item))
+        .filter((item) => item.quantity > 0),
+    );
+  }
+
+  function openCart(step: CheckoutStep = "cart") {
+    setCheckoutStep(step);
+    setCheckoutOpen(true);
   }
 
   async function sendVoiceQuestion(question: string) {
@@ -463,7 +666,7 @@ export default function App() {
             </div>
             <div className="owner-status-pill">
               <span className="status-dot" />
-              {usingPreviewData ? "Preview mode active" : "Local demo mode ready · live sync on"}
+              {usingPreviewData ? "Preview mode active" : "Local mode ready · live sync on"}
             </div>
           </header>
 
@@ -495,20 +698,22 @@ export default function App() {
 
             <main className="owner-main">
               {usingPreviewData ? <div className="owner-banner">Backend not reachable, so the app is showing preview data.</div> : null}
-              {checkoutState ? (
+              {checkoutState.length > 0 ? (
                 <div className="owner-banner success">
-                  Sale confirmed: order #{checkoutState.order_id} for {checkoutState.product_name} at $
-                  {checkoutState.revenue.toFixed(2)}. Tracking {checkoutState.tracking_number ?? "pending"}.
+                  {checkoutState.length} order{checkoutState.length > 1 ? "s" : ""} confirmed. Latest shipment:
+                  {" "}
+                  {checkoutState[checkoutState.length - 1].product_name} with tracking{" "}
+                  {checkoutState[checkoutState.length - 1].tracking_number ?? "pending"}.
                 </div>
               ) : null}
               {loading ? <div className="owner-banner">Refreshing command center data...</div> : null}
 
               <section>
                 <div className="section-head">
-                  <div className="section-title">Demo control room</div>
+                  <div className="section-title">Control room</div>
                   <div className="section-actions">
                     <button onClick={handleRunDemo} disabled={activeTask !== null} className="owner-btn">
-                      {activeTask === "demo-run-all" ? "Running..." : "Launch Demo Loop"}
+                      {activeTask === "demo-run-all" ? "Running..." : "Launch Automation"}
                     </button>
                     <button onClick={() => handleTrigger("trend-radar")} disabled={activeTask !== null} className="owner-btn ghost">
                       {activeTask === "trend-radar" ? "Running..." : "Run Radar"}
@@ -644,14 +849,14 @@ export default function App() {
               </section>
 
               <section className="panel-section">
-                <div className="panel-title">Video demo script</div>
-                <div className="activity-text">1. Run demo loop. 2. Open storefront. 3. Buy demo product. 4. Switch back and show revenue + routing.</div>
+                <div className="panel-title">Video script</div>
+                <div className="activity-text">1. Run automation. 2. Open storefront. 3. Buy featured product. 4. Switch back and show revenue + routing.</div>
               </section>
 
               <section className="panel-section">
                 <div className="panel-title">Exceptions</div>
                 {dashboard.exceptions.length === 0 ? (
-                  <div className="activity-text">No blocking exceptions in local demo mode.</div>
+                  <div className="activity-text">No blocking exceptions in local mode.</div>
                 ) : (
                   dashboard.exceptions.map((item) => (
                     <div className={`alert ${item.severity === "high" ? "alert-danger" : "alert-warn"}`} key={item.id}>
@@ -677,19 +882,19 @@ export default function App() {
               <a>Tech</a>
             </nav>
             <div className="store-actions">
-              <button className="icon-bubble" onClick={() => setCheckoutOpen(true)}>{cartItems.length}</button>
+              <button className="icon-bubble" onClick={() => openCart("cart")}>{cartCount}</button>
               <button className="signin-btn" onClick={() => setMode("owner")}>Back to HQ</button>
             </div>
           </header>
 
           <section className="store-hero">
             <div className="store-hero-copy">
-              <p className="store-kicker">AI-curated · sourced direct from factory</p>
+              <p className="store-kicker">Curated from live trend signals · sourced direct from factory</p>
               <h1>{storefront.hero_product?.product_name ?? "Products going viral right now"}</h1>
               <p>{storefront.hero_product?.subtitle ?? "We watch TikTok, Instagram, and Chinese factory districts so you don't have to."}</p>
               <div className="store-cta-row">
-                <button className="store-btn primary" onClick={() => storefront.hero_product && handleCheckout(storefront.hero_product.id)}>
-                  {activeTask === `checkout-${storefront.hero_product?.id}` ? "Processing..." : "Buy now"}
+                <button className="store-btn primary" onClick={() => storefront.hero_product && addToCart(storefront.hero_product.id, "checkout")}>
+                  {activeTask === "checkout-cart" ? "Processing..." : "Buy now"}
                 </button>
                 <button className="store-btn">{storefront.updated_label}</button>
               </div>
@@ -698,8 +903,9 @@ export default function App() {
               <div className="creator-card tall">
                 <img
                   className="media-photo"
-                  src={getProductImage(storefront.hero_product?.product_name ?? "demo product")}
+                  src={getProductImage(storefront.hero_product?.product_name ?? "featured product")}
                   alt={storefront.hero_product?.product_name ?? "Featured product"}
+                  onError={handleProductImageError}
                 />
                 <div className="creator-tag">{storefront.hero_product?.badge ?? "Trending"} · ready to sell</div>
               </div>
@@ -714,10 +920,12 @@ export default function App() {
             </div>
           </section>
 
-          {checkoutState ? (
+          {checkoutState.length > 0 ? (
             <section className="store-section">
               <div className="checkout-banner">
-                Order #{checkoutState.order_id} confirmed for {checkoutState.product_name}. Tracking {checkoutState.tracking_number ?? "pending"}.
+                {checkoutState.length} order{checkoutState.length > 1 ? "s" : ""} confirmed. Latest tracking number:
+                {" "}
+                {checkoutState[checkoutState.length - 1].tracking_number ?? "pending"}.
               </div>
             </section>
           ) : null}
@@ -740,7 +948,7 @@ export default function App() {
                 <article className="product-card" key={product.id}>
                   <div className={`product-media ${product.image_tone}`}>
                     <span className="product-tag">{product.badge}</span>
-                    <img className="product-photo" src={getProductImage(product.product_name)} alt={product.product_name} />
+                    <img className="product-photo" src={getProductImage(product.product_name)} alt={product.product_name} onError={handleProductImageError} />
                   </div>
                   <div className="product-body">
                     <div className="product-name">{product.product_name}</div>
@@ -749,9 +957,7 @@ export default function App() {
                       <div>
                         <strong>${product.price.toFixed(2)}</strong> <span>{product.compare_at_price ? `$${product.compare_at_price.toFixed(2)}` : ""}</span>
                       </div>
-                      <button className="add-btn" onClick={() => handleCheckout(product.id)}>
-                        {activeTask === `checkout-${product.id}` ? "..." : "+"}
-                      </button>
+                      <button className="add-btn" onClick={() => addToCart(product.id, "cart")}>+</button>
                     </div>
                   </div>
                 </article>
@@ -762,22 +968,32 @@ export default function App() {
           <section className="store-section">
             <div className="store-section-head">
               <div>
-                <p className="store-kicker green">AI influencer content</p>
+                <p className="store-kicker green">Creator campaign</p>
                 <h2>See it in action</h2>
               </div>
               <a>View all content</a>
             </div>
             <div className="influencer-grid">
-              {INFLUENCER_CARDS.map((card) => (
+              {((storefront.influencer_cards?.length ?? 0) > 0 ? storefront.influencer_cards : FALLBACK_INFLUENCER_CARDS).map((card, index) => (
                 <article className="influencer-card" key={card.handle}>
-                  <div className={`influencer-video ${card.theme}`}>
-                    <img className="influencer-photo" src={getCreatorImage(INFLUENCER_CARDS.indexOf(card))} alt={card.handle} />
+                  <button
+                    className={`influencer-video video-card-button ${card.theme}`}
+                    onClick={() =>
+                      setActiveVideoCard({
+                        title: card.title,
+                        platform: card.platform,
+                        handle: card.handle,
+                        videoUrl: getInfluencerVideo(index),
+                      })
+                    }
+                  >
+                    <img className="influencer-photo" src={getCreatorImage(index)} alt={card.handle} />
                     <span className="platform-chip">{card.platform.slice(0, 2).toUpperCase()}</span>
                     <div className="play-button">▶</div>
                     <div className="creator-footer">{card.handle}</div>
-                  </div>
+                  </button>
                   <div className="influencer-body">
-                    <div className="store-kicker">{`AI influencer · ${card.platform}`}</div>
+                    <div className="store-kicker">{`Creator spotlight · ${card.platform}`}</div>
                     <h3>{card.title}</h3>
                     <p>{card.stats}</p>
                   </div>
@@ -810,73 +1026,130 @@ export default function App() {
               <div className="checkout-drawer" onClick={(event) => event.stopPropagation()}>
                 <div className="checkout-head">
                   <div>
-                    <div className="store-kicker">Checkout</div>
-                    <h3>{selectedCheckoutProduct?.product_name ?? "Your cart"}</h3>
+                    <div className="store-kicker">{checkoutStep === "cart" ? "Cart" : "Checkout"}</div>
+                    <h3>{checkoutStep === "cart" ? "Your cart" : "Shipping and payment"}</h3>
                   </div>
                   <button className="checkout-close" onClick={() => setCheckoutOpen(false)}>x</button>
                 </div>
 
-                {selectedCheckoutProduct ? (
-                  <div className="checkout-line">
-                    <img className="checkout-thumb" src={getProductImage(selectedCheckoutProduct.product_name)} alt={selectedCheckoutProduct.product_name} />
-                    <div>
-                      <div className="checkout-item-name">{selectedCheckoutProduct.product_name}</div>
-                      <div className="checkout-item-meta">{selectedCheckoutProduct.subtitle}</div>
-                    </div>
-                    <strong>${selectedCheckoutProduct.price.toFixed(2)}</strong>
+                {cartItems.length === 0 ? (
+                  <div className="checkout-empty">
+                    Your cart is empty. Add products from the storefront to continue.
                   </div>
-                ) : null}
+                ) : (
+                  <>
+                    <div className="checkout-list">
+                      {cartItems.map((item) => (
+                        <div className="checkout-line" key={item.product.id}>
+                          <img className="checkout-thumb" src={getProductImage(item.product.product_name)} alt={item.product.product_name} onError={handleProductImageError} />
+                          <div className="checkout-item-copy">
+                            <div className="checkout-item-name">{item.product.product_name}</div>
+                            <div className="checkout-item-meta">{item.product.subtitle}</div>
+                            <div className="checkout-qty-row">
+                              <button className="qty-btn" onClick={() => updateCartQuantity(item.product.id, item.quantity - 1)}>-</button>
+                              <span className="qty-count">{item.quantity}</span>
+                              <button className="qty-btn" onClick={() => updateCartQuantity(item.product.id, item.quantity + 1)}>+</button>
+                              <button className="checkout-remove" onClick={() => updateCartQuantity(item.product.id, 0)}>Remove</button>
+                            </div>
+                          </div>
+                          <strong>${(item.product.price * item.quantity).toFixed(2)}</strong>
+                        </div>
+                      ))}
+                    </div>
 
-                <div className="checkout-grid">
-                  <label>
-                    Email
-                    <input value={checkoutForm.email} onChange={(event) => updateCheckoutField("email", event.target.value)} />
-                  </label>
-                  <label>
-                    Full name
-                    <input value={checkoutForm.fullName} onChange={(event) => updateCheckoutField("fullName", event.target.value)} />
-                  </label>
-                  <label className="span-2">
-                    Shipping address
-                    <input value={checkoutForm.address1} onChange={(event) => updateCheckoutField("address1", event.target.value)} />
-                  </label>
-                  <label>
-                    City
-                    <input value={checkoutForm.city} onChange={(event) => updateCheckoutField("city", event.target.value)} />
-                  </label>
-                  <label>
-                    State
-                    <input value={checkoutForm.state} onChange={(event) => updateCheckoutField("state", event.target.value)} />
-                  </label>
-                  <label>
-                    ZIP code
-                    <input value={checkoutForm.zip} onChange={(event) => updateCheckoutField("zip", event.target.value)} />
-                  </label>
-                  <label>
-                    Country
-                    <input value={checkoutForm.country} onChange={(event) => updateCheckoutField("country", event.target.value)} />
-                  </label>
-                  <label className="span-2">
-                    Card number
-                    <input value={checkoutForm.cardNumber} onChange={(event) => updateCheckoutField("cardNumber", event.target.value)} />
-                  </label>
-                  <label>
-                    Expiry
-                    <input value={checkoutForm.expiry} onChange={(event) => updateCheckoutField("expiry", event.target.value)} />
-                  </label>
-                  <label>
-                    CVC
-                    <input value={checkoutForm.cvc} onChange={(event) => updateCheckoutField("cvc", event.target.value)} />
-                  </label>
-                </div>
+                    {checkoutStep === "checkout" ? (
+                      <div className="checkout-grid">
+                        <label>
+                          Email
+                          <input value={checkoutForm.email} onChange={(event) => updateCheckoutField("email", event.target.value)} />
+                        </label>
+                        <label>
+                          Full name
+                          <input value={checkoutForm.fullName} onChange={(event) => updateCheckoutField("fullName", event.target.value)} />
+                        </label>
+                        <label className="span-2">
+                          Shipping address
+                          <input value={checkoutForm.address1} onChange={(event) => updateCheckoutField("address1", event.target.value)} />
+                        </label>
+                        <label>
+                          City
+                          <input value={checkoutForm.city} onChange={(event) => updateCheckoutField("city", event.target.value)} />
+                        </label>
+                        <label>
+                          State
+                          <input value={checkoutForm.state} onChange={(event) => updateCheckoutField("state", event.target.value)} />
+                        </label>
+                        <label>
+                          ZIP code
+                          <input value={checkoutForm.zip} onChange={(event) => updateCheckoutField("zip", event.target.value)} />
+                        </label>
+                        <label>
+                          Country
+                          <input value={checkoutForm.country} onChange={(event) => updateCheckoutField("country", event.target.value)} />
+                        </label>
+                        <label className="span-2">
+                          Card number
+                          <input value={checkoutForm.cardNumber} onChange={(event) => updateCheckoutField("cardNumber", event.target.value)} />
+                        </label>
+                        <label>
+                          Expiry
+                          <input value={checkoutForm.expiry} onChange={(event) => updateCheckoutField("expiry", event.target.value)} />
+                        </label>
+                        <label>
+                          CVC
+                          <input value={checkoutForm.cvc} onChange={(event) => updateCheckoutField("cvc", event.target.value)} />
+                        </label>
+                      </div>
+                    ) : null}
+                  </>
+                )}
 
                 <div className="checkout-footer">
-                  <div className="checkout-total">
-                    Total <strong>${selectedCheckoutProduct?.price.toFixed(2) ?? "0.00"}</strong>
+                  <div className="checkout-total checkout-total-breakdown">
+                    <span>Subtotal <strong>${cartSubtotal.toFixed(2)}</strong></span>
+                    <span>Shipping <strong>{shippingTotal === 0 ? "Free" : `$${shippingTotal.toFixed(2)}`}</strong></span>
+                    <span>Estimated tax <strong>${taxTotal.toFixed(2)}</strong></span>
+                    <span className="checkout-grand-total">Total <strong>${orderTotal.toFixed(2)}</strong></span>
                   </div>
-                  <button className="store-btn primary checkout-submit" onClick={submitCheckout}>
-                    {activeTask === `checkout-${selectedCheckoutProduct?.id}` ? "Processing..." : "Pay now"}
-                  </button>
+                  <div className="checkout-actions">
+                    {checkoutStep === "checkout" ? (
+                      <>
+                        <button className="store-btn" onClick={() => setCheckoutStep("cart")}>Back to cart</button>
+                        <button className="store-btn primary checkout-submit" onClick={submitCheckout} disabled={cartItems.length === 0}>
+                          {activeTask === "checkout-cart" ? "Processing..." : "Place order"}
+                        </button>
+                      </>
+                    ) : (
+                      <button className="store-btn primary checkout-submit" onClick={() => setCheckoutStep("checkout")} disabled={cartItems.length === 0}>
+                        Proceed to checkout
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          {activeVideoCard ? (
+            <div className="checkout-overlay" onClick={() => setActiveVideoCard(null)}>
+              <div className="checkout-drawer video-drawer" onClick={(event) => event.stopPropagation()}>
+                <div className="checkout-head">
+                  <div>
+                    <div className="store-kicker">{activeVideoCard.platform} creator clip</div>
+                    <h3>{activeVideoCard.title}</h3>
+                  </div>
+                  <button className="checkout-close" onClick={() => setActiveVideoCard(null)}>x</button>
+                </div>
+                <video
+                  className="video-player"
+                  src={activeVideoCard.videoUrl}
+                  controls
+                  autoPlay
+                  playsInline
+                  preload="metadata"
+                />
+                <div className="video-caption">
+                  <strong>{activeVideoCard.handle}</strong> showing the product in a short-form creator format.
                 </div>
               </div>
             </div>

@@ -61,9 +61,18 @@ export type StorefrontProduct = {
   image_tone: string;
 };
 
+export type InfluencerCard = {
+  platform: string;
+  handle: string;
+  title: string;
+  stats: string;
+  theme: string;
+};
+
 export type StorefrontResponse = {
   products: StorefrontProduct[];
   hero_product: StorefrontProduct | null;
+  influencer_cards: InfluencerCard[];
   total_products: number;
   updated_label: string;
 };

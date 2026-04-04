@@ -31,7 +31,7 @@ export async function triggerTask(
 export async function runDemo() {
   const response = await fetch(`${API_URL}/api/demo/run-all`, { method: "POST" });
   if (!response.ok) {
-    throw new Error("Failed to run the demo flow");
+    throw new Error("Failed to run the automation flow");
   }
   return response.json();
 }

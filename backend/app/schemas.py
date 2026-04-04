@@ -71,15 +71,24 @@ class StorefrontProduct(BaseModel):
     image_tone: str
 
 
+class InfluencerCard(BaseModel):
+    platform: str
+    handle: str
+    title: str
+    stats: str
+    theme: str
+
+
 class StorefrontResponse(BaseModel):
     products: list[StorefrontProduct]
     hero_product: StorefrontProduct | None
+    influencer_cards: list[InfluencerCard]
     total_products: int
     updated_label: str
 
 
 class CheckoutRequest(BaseModel):
-    email: str = "demo-buyer@example.com"
+    email: str = "buyer@example.com"
 
 
 class CheckoutResponse(BaseModel):
