@@ -46,3 +46,33 @@ export type DashboardResponse = {
   exceptions: ExceptionItem[];
 };
 
+export type StorefrontProduct = {
+  id: number;
+  product_name: string;
+  source: string;
+  status: string;
+  price: number;
+  compare_at_price: number | null;
+  margin: number;
+  channels: string[];
+  factory_hint: { city?: string; category?: string; factory_count?: number } | null;
+  badge: string;
+  subtitle: string;
+  image_tone: string;
+};
+
+export type StorefrontResponse = {
+  products: StorefrontProduct[];
+  hero_product: StorefrontProduct | null;
+  total_products: number;
+  updated_label: string;
+};
+
+export type CheckoutResponse = {
+  order_id: number;
+  product_name: string;
+  revenue: number;
+  supplier: string;
+  tracking_number: string | null;
+  status: string;
+};

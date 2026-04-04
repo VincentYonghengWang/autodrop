@@ -19,8 +19,9 @@ class Settings(BaseSettings):
     admin_password: str = "autodrop-admin"
     backend_cors_origins: str = "http://localhost:5173"
 
-    database_url: str = "postgresql+psycopg://autodrop:autodrop@db:5432/autodrop"
+    database_url: str = "sqlite:///./autodrop.db"
     redis_url: str = "redis://redis:6379/0"
+    demo_mode: bool = True
 
     margin_floor: float = 0.20
     viral_score_threshold: int = 60
@@ -59,4 +60,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-

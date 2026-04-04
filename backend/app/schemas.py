@@ -55,3 +55,37 @@ class TriggerResponse(BaseModel):
     task_name: str
     status: str
 
+
+class StorefrontProduct(BaseModel):
+    id: int
+    product_name: str
+    source: str
+    status: str
+    price: float
+    compare_at_price: float | None
+    margin: float
+    channels: list[str]
+    factory_hint: dict | None
+    badge: str
+    subtitle: str
+    image_tone: str
+
+
+class StorefrontResponse(BaseModel):
+    products: list[StorefrontProduct]
+    hero_product: StorefrontProduct | None
+    total_products: int
+    updated_label: str
+
+
+class CheckoutRequest(BaseModel):
+    email: str = "demo-buyer@example.com"
+
+
+class CheckoutResponse(BaseModel):
+    order_id: int
+    product_name: str
+    revenue: float
+    supplier: str
+    tracking_number: str | None
+    status: str
