@@ -76,3 +76,8 @@ export type CheckoutResponse = {
   tracking_number: string | null;
   status: string;
 };
+
+export type VoiceAssistantResponse = {
+  answer: string;
+  audio_base64: string | null;
+};

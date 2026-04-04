@@ -89,3 +89,12 @@ class CheckoutResponse(BaseModel):
     supplier: str
     tracking_number: str | None
     status: str
+
+
+class VoiceAssistantRequest(BaseModel):
+    question: str
+
+
+class VoiceAssistantResponse(BaseModel):
+    answer: str
+    audio_base64: str | None = None

@@ -1,4 +1,4 @@
-import type { CheckoutResponse, DashboardResponse, StorefrontResponse } from "./types";
+import type { CheckoutResponse, DashboardResponse, StorefrontResponse, VoiceAssistantResponse } from "./types";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
@@ -44,6 +44,18 @@ export async function checkoutProduct(productId: number, email: string): Promise
   });
   if (!response.ok) {
     throw new Error("Failed to simulate checkout");
+  }
+  return response.json();
+}
+
+export async function askVoiceAssistant(question: string): Promise<VoiceAssistantResponse> {
+  const response = await fetch(`${API_URL}/api/storefront/voice-assistant`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to contact voice assistant");
   }
   return response.json();
 }

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { checkoutProduct as submitCheckoutRequest, fetchDashboard, fetchStorefront, runDemo, triggerTask } from "./api";
-import type { CheckoutResponse, DashboardResponse, StorefrontResponse } from "./types";
+import { askVoiceAssistant, checkoutProduct as submitCheckoutRequest, fetchDashboard, fetchStorefront, runDemo, triggerTask } from "./api";
+import type { CheckoutResponse, DashboardResponse, StorefrontResponse, VoiceAssistantResponse } from "./types";
 
 const FALLBACK_DASHBOARD: DashboardResponse = {
   metrics: [
@@ -119,6 +119,27 @@ type WorkflowEvent = {
   tone: "info" | "success";
 };
 
+type SpeechRecognitionEventLike = {
+  results: ArrayLike<ArrayLike<{ transcript: string }>>;
+};
+
+type SpeechRecognitionLike = {
+  lang: string;
+  interimResults: boolean;
+  maxAlternatives: number;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+};
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+
+type VoiceMessage = {
+  speaker: "user" | "assistant";
+  text: string;
+};
+
 function svgDataUri(svg: string): string {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
@@ -220,6 +241,12 @@ export default function App() {
   });
   const [workflowSteps, setWorkflowSteps] = useState<WorkflowStep[]>([]);
   const [workflowEvents, setWorkflowEvents] = useState<WorkflowEvent[]>([]);
+  const [voiceOpen, setVoiceOpen] = useState(false);
+  const [voiceMessages, setVoiceMessages] = useState<VoiceMessage[]>([
+    { speaker: "assistant", text: "Hi, I can answer questions about pricing, trend sources, margins, and shipping for the products in this store." },
+  ]);
+  const [voiceInput, setVoiceInput] = useState("");
+  const [voiceListening, setVoiceListening] = useState(false);
 
   function pushWorkflowEvent(message: string, tone: "info" | "success" = "info") {
     setWorkflowEvents((current) => [
@@ -356,6 +383,45 @@ export default function App() {
 
   function updateCheckoutField(field: keyof CheckoutForm, value: string) {
     setCheckoutForm((current) => ({ ...current, [field]: value }));
+  }
+
+  async function sendVoiceQuestion(question: string) {
+    const trimmed = question.trim();
+    if (!trimmed) {
+      return;
+    }
+    setVoiceMessages((current) => [...current, { speaker: "user", text: trimmed }]);
+    setVoiceInput("");
+    const response: VoiceAssistantResponse = await askVoiceAssistant(trimmed);
+    setVoiceMessages((current) => [...current, { speaker: "assistant", text: response.answer }]);
+    if (response.audio_base64) {
+      const audio = new Audio(`data:audio/mpeg;base64,${response.audio_base64}`);
+      void audio.play().catch(() => undefined);
+    } else if ("speechSynthesis" in window) {
+      const utterance = new SpeechSynthesisUtterance(response.answer);
+      window.speechSynthesis.speak(utterance);
+    }
+  }
+
+  function startVoiceListening() {
+    const RecognitionCtor =
+      (window as Window & { webkitSpeechRecognition?: SpeechRecognitionConstructor }).webkitSpeechRecognition ??
+      (window as Window & { SpeechRecognition?: SpeechRecognitionConstructor }).SpeechRecognition;
+    if (!RecognitionCtor) {
+      return;
+    }
+    const recognition = new RecognitionCtor();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    setVoiceListening(true);
+    recognition.onresult = (event: SpeechRecognitionEventLike) => {
+      const transcript = event.results[0][0].transcript;
+      void sendVoiceQuestion(transcript);
+    };
+    recognition.onerror = () => setVoiceListening(false);
+    recognition.onend = () => setVoiceListening(false);
+    recognition.start();
   }
 
   const headerMetrics = useMemo(
@@ -611,6 +677,7 @@ export default function App() {
               <a>Tech</a>
             </nav>
             <div className="store-actions">
+              <button className="icon-bubble" onClick={() => setVoiceOpen(true)}>☎</button>
               <button className="icon-bubble" onClick={() => setCheckoutOpen(true)}>{cartItems.length}</button>
               <button className="signin-btn" onClick={() => setMode("owner")}>Back to HQ</button>
             </div>
@@ -810,6 +877,39 @@ export default function App() {
                   </div>
                   <button className="store-btn primary checkout-submit" onClick={submitCheckout}>
                     {activeTask === `checkout-${selectedCheckoutProduct?.id}` ? "Processing..." : "Pay now"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          {voiceOpen ? (
+            <div className="checkout-overlay" onClick={() => setVoiceOpen(false)}>
+              <div className="checkout-drawer voice-drawer" onClick={(event) => event.stopPropagation()}>
+                <div className="checkout-head">
+                  <div>
+                    <div className="store-kicker">Voice assistant</div>
+                    <h3>Talk to Drifty about products</h3>
+                  </div>
+                  <button className="checkout-close" onClick={() => setVoiceOpen(false)}>x</button>
+                </div>
+                <div className="voice-feed">
+                  {voiceMessages.map((message, index) => (
+                    <div key={`${message.speaker}-${index}`} className={`voice-bubble voice-${message.speaker}`}>
+                      {message.text}
+                    </div>
+                  ))}
+                </div>
+                <div className="voice-controls">
+                  <input
+                    className="voice-input"
+                    placeholder="Ask about a product, price, shipping, or trend source"
+                    value={voiceInput}
+                    onChange={(event) => setVoiceInput(event.target.value)}
+                  />
+                  <button className="store-btn" onClick={() => void sendVoiceQuestion(voiceInput)}>Send</button>
+                  <button className="store-btn primary" onClick={startVoiceListening}>
+                    {voiceListening ? "Listening..." : "Talk"}
                   </button>
                 </div>
               </div>

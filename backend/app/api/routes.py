@@ -3,10 +3,19 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.db import SessionLocal, get_db
-from app.schemas import CheckoutRequest, CheckoutResponse, DashboardResponse, StorefrontResponse, TriggerResponse
+from app.schemas import (
+    CheckoutRequest,
+    CheckoutResponse,
+    DashboardResponse,
+    StorefrontResponse,
+    TriggerResponse,
+    VoiceAssistantRequest,
+    VoiceAssistantResponse,
+)
 from app.services.demo_flow import run_sync_task, simulate_checkout
 from app.services.dashboard import get_dashboard_payload
 from app.services.storefront import get_storefront_payload
+from app.services.voice_assistant import build_voice_reply
 from app.worker.tasks import (
     run_listing_pipeline,
     run_ops_loop,
@@ -90,3 +99,9 @@ def checkout_product(product_id: int, payload: CheckoutRequest, db: Session = De
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return CheckoutResponse(**result)
+
+
+@router.post("/storefront/voice-assistant", response_model=VoiceAssistantResponse)
+def storefront_voice_assistant(payload: VoiceAssistantRequest, db: Session = Depends(get_db)) -> VoiceAssistantResponse:
+    result = build_voice_reply(payload.question, db)
+    return VoiceAssistantResponse(**result)

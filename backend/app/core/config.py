@@ -52,6 +52,9 @@ class Settings(BaseSettings):
     remove_bg_api_key: str = ""
     sendgrid_api_key: str = ""
     easypost_api_key: str = ""
+    elevenlabs_api_key: str = ""
+    elevenlabs_voice_id: str = "JBFqnCBsd6RMkjVDRZzb"
+    elevenlabs_model_id: str = "eleven_multilingual_v2"
 
     @computed_field
     @property
