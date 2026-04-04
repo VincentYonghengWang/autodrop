@@ -38,6 +38,8 @@ class Settings(BaseSettings):
     instagram_business_account_id: str = ""
     openai_api_key: str = ""
     anthropic_api_key: str = ""
+    minimax_api_key: str = ""
+    minimax_model: str = "MiniMax-M2.5"
     shopify_api_key: str = ""
     shopify_store_domain: str = ""
     amazon_sp_api_refresh_token: str = ""
