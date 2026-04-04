@@ -36,11 +36,11 @@ export async function runDemo() {
   return response.json();
 }
 
-export async function checkoutProduct(productId: number): Promise<CheckoutResponse> {
+export async function checkoutProduct(productId: number, email: string): Promise<CheckoutResponse> {
   const response = await fetch(`${API_URL}/api/storefront/checkout/${productId}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: "demo-buyer@example.com" }),
+    body: JSON.stringify({ email }),
   });
   if (!response.ok) {
     throw new Error("Failed to simulate checkout");

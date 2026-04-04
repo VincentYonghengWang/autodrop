@@ -32,6 +32,10 @@ def test_trend_to_candidate_pipeline(db_session) -> None:
     assert len(approved_products) == 2
     assert all(product.status == "approved" for product in approved_products)
 
+    second_run = trend_radar.run(db_session)
+    assert second_run["inserted"] == 0
+    assert second_run["skipped"] is True
+
 
 def test_end_to_end_demo_robot_flow(db_session) -> None:
     trend_radar.run(db_session)

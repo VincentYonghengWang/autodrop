@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -20,6 +21,17 @@ TREND_QUERIES = {
 
 
 def run(db: Session) -> dict:
+    recent_cutoff = datetime.utcnow() - timedelta(hours=24)
+    recent_signal = db.scalar(select(TrendSignal.id).where(TrendSignal.detected_at >= recent_cutoff).limit(1))
+    if recent_signal:
+        log_activity(
+            db,
+            "Trend Radar",
+            "No new trend shift detected in the last 24 hours, so the live product mix was left unchanged.",
+            metadata={"queries": TREND_QUERIES, "window_hours": 24},
+        )
+        return {"inserted": 0, "sources": list(TREND_QUERIES), "skipped": True}
+
     synthetic_signals = [
         {
             "source": "instagram",
@@ -50,5 +62,4 @@ def run(db: Session) -> dict:
         f"{inserted} new qualifying signals ingested from TikTok, Instagram, Douyin, Amazon, and Google.",
         metadata={"queries": TREND_QUERIES},
     )
-    return {"inserted": inserted, "sources": list(TREND_QUERIES)}
-
+    return {"inserted": inserted, "sources": list(TREND_QUERIES), "skipped": False}

@@ -318,6 +318,47 @@ a {
   gap: 10px;
 }
 
+.workflow-console {
+  background: #0d0f12;
+  border: 1px solid rgba(0, 229, 160, 0.14);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.workflow-current {
+  padding: 12px 14px;
+  background: rgba(0, 229, 160, 0.08);
+  color: var(--owner-accent);
+  font-size: 12px;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(0, 229, 160, 0.16);
+}
+
+.workflow-feed {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+}
+
+.workflow-line {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: #c9d0d7;
+}
+
+.workflow-line-success {
+  color: #a6f4ce;
+}
+
+.workflow-bullet {
+  min-width: 18px;
+  color: var(--owner-accent);
+}
+
 .owner-metric-card {
   background: var(--owner-surface);
   border: 1px solid var(--owner-border);
@@ -791,6 +832,19 @@ a {
   transform: translate(-50%, -50%);
 }
 
+.media-photo,
+.product-photo,
+.influencer-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.media-photo {
+  border-radius: 14px;
+}
+
 .creator-tag {
   position: absolute;
   left: 12px;
@@ -883,6 +937,8 @@ a {
   height: 190px;
   padding: 12px;
   position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(39, 33, 28, 0.06);
 }
 
 .product-media.peach {
@@ -960,6 +1016,7 @@ a {
   margin: 12px;
   border-radius: 16px;
   position: relative;
+  overflow: hidden;
 }
 
 .influencer-video.obsidian {
@@ -997,6 +1054,7 @@ a {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.14);
   color: rgba(255, 255, 255, 0.8);
+  z-index: 1;
 }
 
 .creator-footer {
@@ -1004,6 +1062,14 @@ a {
   left: 14px;
   bottom: 12px;
   color: white;
+  z-index: 1;
+}
+
+.influencer-video::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.08) 10%, rgba(0, 0, 0, 0.5) 100%);
 }
 
 .influencer-body {
@@ -1051,6 +1117,108 @@ a {
   background: rgba(74, 222, 128, 0.14);
   border: 1px solid rgba(74, 222, 128, 0.35);
   color: #d6ffe4;
+}
+
+.checkout-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 21, 19, 0.46);
+  display: grid;
+  place-items: center;
+  z-index: 30;
+  padding: 24px;
+}
+
+.checkout-drawer {
+  width: min(760px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  background: var(--store-surface);
+  border: 1px solid var(--store-border);
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.18);
+}
+
+.checkout-head,
+.checkout-line,
+.checkout-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.checkout-close {
+  border: 1px solid var(--store-border);
+  background: white;
+  border-radius: 999px;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+}
+
+.checkout-line {
+  margin: 18px 0 22px;
+  padding: 12px;
+  border: 1px solid var(--store-border);
+  border-radius: 18px;
+  align-items: center;
+}
+
+.checkout-thumb {
+  width: 88px;
+  height: 88px;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.checkout-item-name {
+  font-size: 22px;
+  font-family: "Instrument Serif", serif;
+}
+
+.checkout-item-meta {
+  color: var(--store-muted);
+  font-size: 14px;
+}
+
+.checkout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.checkout-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--store-text);
+}
+
+.checkout-grid label.span-2 {
+  grid-column: span 2;
+}
+
+.checkout-grid input {
+  border: 1px solid var(--store-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: white;
+  font: inherit;
+}
+
+.checkout-footer {
+  margin-top: 18px;
+}
+
+.checkout-total {
+  font-size: 18px;
+}
+
+.checkout-submit {
+  min-width: 150px;
 }
 
 @media (max-width: 1180px) {
@@ -1124,5 +1292,11 @@ a {
   .store-hero-copy h1,
   .store-section h2 {
     font-size: 40px;
+  }
+
+  .checkout-grid,
+  .checkout-grid label.span-2 {
+    grid-template-columns: 1fr;
+    grid-column: auto;
   }
 }

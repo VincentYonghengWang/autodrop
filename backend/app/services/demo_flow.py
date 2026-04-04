@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import Order, OrderMapping, ProductCandidate
+from app.robots.common import log_activity
 from app.robots import analytics_brain, channel_publisher, cs_bot, douyin_intel, influencer_factory, listing_factory, order_router, price_engine, product_scout, trend_radar
 
 
@@ -11,7 +12,19 @@ def run_sync_task(task_name: str, db: Session) -> dict:
     if task_name == "trend_radar":
         result = trend_radar.run(db)
         product_scout.run(db)
-        return result
+        listing_factory.run(db)
+        influencer_factory.run(db)
+        publish_result = channel_publisher.run(db)
+        log_activity(
+            db,
+            "Storefront Sync",
+            "Customer storefront refreshed with the latest approved products and hero item.",
+        )
+        return {
+            "inserted": result.get("inserted", 0),
+            "published": publish_result.get("published", 0),
+            "skipped": result.get("skipped", False),
+        }
     if task_name == "douyin_intel":
         result = douyin_intel.run(db)
         product_scout.run(db)
@@ -33,6 +46,11 @@ def run_sync_task(task_name: str, db: Session) -> dict:
         listing_factory.run(db)
         influencer_factory.run(db)
         channel_publisher.run(db)
+        log_activity(
+            db,
+            "Storefront Sync",
+            "Customer storefront refreshed with the latest approved products and hero item.",
+        )
         price_engine.run(db)
         return analytics_brain.run(db)
     raise ValueError(f"Unsupported task: {task_name}")

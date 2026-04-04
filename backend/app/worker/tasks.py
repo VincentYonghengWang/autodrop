@@ -19,7 +19,9 @@ def run_trend_radar() -> dict:
     with SessionLocal() as db:
         result = trend_radar.run(db)
         product_scout.run(db)
-        return result
+        listing_factory.run(db)
+        influencer_factory.run(db)
+        return channel_publisher.run(db) | result
 
 
 @celery_app.task
@@ -55,4 +57,3 @@ def run_ops_loop() -> dict:
     with SessionLocal() as db:
         order_router.run(db)
         return cs_bot.run(db)
-

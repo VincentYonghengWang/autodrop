@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { checkoutProduct, fetchDashboard, fetchStorefront, runDemo, triggerTask } from "./api";
+import { checkoutProduct as submitCheckoutRequest, fetchDashboard, fetchStorefront, runDemo, triggerTask } from "./api";
 import type { CheckoutResponse, DashboardResponse, StorefrontResponse } from "./types";
 
 const FALLBACK_DASHBOARD: DashboardResponse = {
@@ -89,6 +89,111 @@ const FACTORY_CARDS = [
 
 type ViewMode = "owner" | "storefront";
 type TriggerTask = "trend-radar" | "price-engine" | "douyin-intel" | "analytics-brain" | "listing-pipeline" | "ops-loop";
+const LIVE_SYNC_INTERVAL_MS = 3000;
+
+type CartProduct = StorefrontResponse["products"][number];
+
+type CheckoutForm = {
+  email: string;
+  fullName: string;
+  address1: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+  cardNumber: string;
+  expiry: string;
+  cvc: string;
+};
+
+type WorkflowStep = {
+  key: string;
+  title: string;
+  detail: string;
+  status: "pending" | "running" | "done";
+};
+
+type WorkflowEvent = {
+  id: string;
+  message: string;
+  tone: "info" | "success";
+};
+
+function svgDataUri(svg: string): string {
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function getProductImage(productName: string): string {
+  const key = productName.toLowerCase();
+  if (key.includes("pet hair remover")) {
+    return "https://petsroller.net/cdn/shop/files/AuR0Thd1OnPAhAfIVrAx.webp?v=1726161015&width=1946";
+  }
+  if (key.includes("neck fan")) {
+    return "https://www.panergy.com/cdn/shop/files/HF340-Black-1.png?v=1699562288&width=416";
+  }
+  if (key.includes("jellyfish")) {
+    return "https://lampjellyfish.com/cdn/shop/products/S0d63bc229c144e6699a271b1f4e44795e_8a32fe28-1dc8-4593-b109-21460576c91a.jpg?v=1656311825&width=1946";
+  }
+  if (key.includes("ice plunge")) {
+    return "https://plunge.com/cdn/shop/files/Pop-Up-Tub-Only-Main.jpg?v=1765577086&width=1024";
+  }
+  if (key.includes("walking pad")) {
+    return svgDataUri(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+        <rect width="800" height="600" rx="32" fill="#eff0ea"/>
+        <rect x="160" y="280" width="480" height="110" rx="40" fill="#2f3136"/>
+        <rect x="192" y="302" width="416" height="66" rx="28" fill="#595c63"/>
+        <circle cx="238" cy="335" r="26" fill="#131417"/>
+        <circle cx="562" cy="335" r="26" fill="#131417"/>
+        <text x="400" y="96" text-anchor="middle" font-family="Arial" font-size="34" fill="#656a59">Foldable Walking Pad</text>
+      </svg>
+    `);
+  }
+  if (key.includes("cable organizer")) {
+    return svgDataUri(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+        <rect width="800" height="600" rx="32" fill="#f1ece6"/>
+        <rect x="245" y="200" width="310" height="180" rx="34" fill="#fefefe" stroke="#d6cabf" stroke-width="8"/>
+        <rect x="300" y="245" width="54" height="90" rx="22" fill="#50545e"/>
+        <rect x="373" y="245" width="54" height="90" rx="22" fill="#50545e"/>
+        <rect x="446" y="245" width="54" height="90" rx="22" fill="#50545e"/>
+        <path d="M327 335v74M400 335v96M473 335v64" stroke="#7f868f" stroke-width="10" stroke-linecap="round"/>
+        <text x="400" y="96" text-anchor="middle" font-family="Arial" font-size="34" fill="#7c6c5f">Magnetic Cable Organizer</text>
+      </svg>
+    `);
+  }
+  return svgDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+      <rect width="800" height="600" rx="32" fill="#f3eee7"/>
+      <rect x="220" y="150" width="360" height="300" rx="48" fill="#ffffff" stroke="#dfd2c5" stroke-width="8"/>
+      <circle cx="400" cy="300" r="84" fill="#ead8c5"/>
+      <text x="400" y="94" text-anchor="middle" font-family="Arial" font-size="34" fill="#7b6f63">AutoDrop Product</text>
+    </svg>
+  `);
+}
+
+function getCreatorImage(index: number): string {
+  const images = [
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=900&q=80",
+  ];
+  return images[index % images.length];
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function createRadarWorkflow(): WorkflowStep[] {
+  return [
+    { key: "scan", title: "Trend Radar", detail: "Checking TikTok, Instagram, Amazon, Douyin, and Google for fresh signals.", status: "pending" },
+    { key: "scout", title: "Product Scout", detail: "Filtering candidates by supplier quality, margin, and factory hints.", status: "pending" },
+    { key: "listing", title: "Listing Factory", detail: "Preparing storefront copy, pricing, and launch-ready creative.", status: "pending" },
+    { key: "publish", title: "Publisher", detail: "Pushing approved products into the live catalog.", status: "pending" },
+    { key: "sync", title: "Storefront Sync", detail: "Refreshing the customer-facing page with the latest hero product.", status: "pending" },
+  ];
+}
 
 export default function App() {
   const [dashboard, setDashboard] = useState<DashboardResponse>(FALLBACK_DASHBOARD);
@@ -98,10 +203,36 @@ export default function App() {
   const [mode, setMode] = useState<ViewMode>("owner");
   const [usingPreviewData, setUsingPreviewData] = useState(false);
   const [checkoutState, setCheckoutState] = useState<CheckoutResponse | null>(null);
+  const [cartItems, setCartItems] = useState<CartProduct[]>([]);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [selectedCheckoutProduct, setSelectedCheckoutProduct] = useState<CartProduct | null>(null);
+  const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>({
+    email: "demo-buyer@example.com",
+    fullName: "Demo Buyer",
+    address1: "1 Market Street",
+    city: "San Francisco",
+    state: "CA",
+    zip: "94105",
+    country: "United States",
+    cardNumber: "4242 4242 4242 4242",
+    expiry: "12/28",
+    cvc: "123",
+  });
+  const [workflowSteps, setWorkflowSteps] = useState<WorkflowStep[]>([]);
+  const [workflowEvents, setWorkflowEvents] = useState<WorkflowEvent[]>([]);
 
-  async function loadData() {
+  function pushWorkflowEvent(message: string, tone: "info" | "success" = "info") {
+    setWorkflowEvents((current) => [
+      ...current,
+      { id: `${Date.now()}-${current.length}`, message, tone },
+    ]);
+  }
+
+  async function loadData(options?: { silent?: boolean }) {
     try {
-      setLoading(true);
+      if (!options?.silent) {
+        setLoading(true);
+      }
       const [dashboardData, storefrontData] = await Promise.all([fetchDashboard(), fetchStorefront()]);
       setDashboard(dashboardData);
       setStorefront(storefrontData);
@@ -111,7 +242,9 @@ export default function App() {
       setStorefront(FALLBACK_STOREFRONT);
       setUsingPreviewData(true);
     } finally {
-      setLoading(false);
+      if (!options?.silent) {
+        setLoading(false);
+      }
     }
   }
 
@@ -119,10 +252,42 @@ export default function App() {
     loadData();
   }, []);
 
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      if (document.hidden || activeTask) {
+        return;
+      }
+      loadData({ silent: true });
+    }, LIVE_SYNC_INTERVAL_MS);
+
+    return () => window.clearInterval(intervalId);
+  }, [activeTask]);
+
   async function handleTrigger(task: TriggerTask) {
     try {
       setActiveTask(task);
-      await triggerTask(task);
+      if (task === "trend-radar") {
+        const steps = createRadarWorkflow();
+        setWorkflowSteps(steps);
+        setWorkflowEvents([]);
+        const progressSequence = (async () => {
+          for (let index = 0; index < steps.length; index += 1) {
+            setWorkflowSteps((current) =>
+              current.map((step, stepIndex) => ({
+                ...step,
+                status: stepIndex < index ? "done" : stepIndex === index ? "running" : "pending",
+              })),
+            );
+            pushWorkflowEvent(`${steps[index].title}: ${steps[index].detail}`);
+            await sleep(index === steps.length - 1 ? 1200 : 900);
+          }
+          setWorkflowSteps((current) => current.map((step) => ({ ...step, status: "done" })));
+          pushWorkflowEvent("Pipeline complete: storefront is now showing the latest approved product set.", "success");
+        })();
+        await Promise.all([triggerTask(task), progressSequence]);
+      } else {
+        await triggerTask(task);
+      }
       await loadData();
     } catch {
       setUsingPreviewData(true);
@@ -134,7 +299,24 @@ export default function App() {
   async function handleRunDemo() {
     try {
       setActiveTask("demo-run-all");
-      await runDemo();
+      const steps = createRadarWorkflow();
+      setWorkflowSteps(steps);
+      setWorkflowEvents([]);
+      const progressSequence = (async () => {
+        for (let index = 0; index < steps.length; index += 1) {
+          setWorkflowSteps((current) =>
+            current.map((step, stepIndex) => ({
+              ...step,
+              status: stepIndex < index ? "done" : stepIndex === index ? "running" : "pending",
+            })),
+          );
+          pushWorkflowEvent(`${steps[index].title}: ${steps[index].detail}`);
+          await sleep(index === steps.length - 1 ? 1200 : 900);
+        }
+        setWorkflowSteps((current) => current.map((step) => ({ ...step, status: "done" })));
+        pushWorkflowEvent("Full automation loop complete: products are live and the storefront is synced.", "success");
+      })();
+      await Promise.all([runDemo(), progressSequence]);
       await loadData();
     } catch {
       setUsingPreviewData(true);
@@ -144,10 +326,25 @@ export default function App() {
   }
 
   async function handleCheckout(productId: number) {
+    const selected = storefront.products.find((product) => product.id === productId) ?? null;
+    if (!selected) {
+      return;
+    }
+    setCartItems([selected]);
+    setSelectedCheckoutProduct(selected);
+    setCheckoutOpen(true);
+  }
+
+  async function submitCheckout() {
+    if (!selectedCheckoutProduct) {
+      return;
+    }
     try {
-      setActiveTask(`checkout-${productId}`);
-      const result = await checkoutProduct(productId);
+      setActiveTask(`checkout-${selectedCheckoutProduct.id}`);
+      const result = await submitCheckoutRequest(selectedCheckoutProduct.id, checkoutForm.email);
       setCheckoutState(result);
+      setCartItems([]);
+      setCheckoutOpen(false);
       await loadData();
       setMode("owner");
     } catch {
@@ -155,6 +352,10 @@ export default function App() {
     } finally {
       setActiveTask(null);
     }
+  }
+
+  function updateCheckoutField(field: keyof CheckoutForm, value: string) {
+    setCheckoutForm((current) => ({ ...current, [field]: value }));
   }
 
   const headerMetrics = useMemo(
@@ -196,7 +397,7 @@ export default function App() {
             </div>
             <div className="owner-status-pill">
               <span className="status-dot" />
-              {usingPreviewData ? "Preview mode active" : "Local demo mode ready"}
+              {usingPreviewData ? "Preview mode active" : "Local demo mode ready · live sync on"}
             </div>
           </header>
 
@@ -261,6 +462,27 @@ export default function App() {
                   ))}
                 </div>
               </section>
+
+              {workflowSteps.length > 0 ? (
+                <section>
+                  <div className="section-head">
+                    <div className="section-title">Live Workflow</div>
+                  </div>
+                  <div className="workflow-console">
+                    <div className="workflow-current">
+                      {workflowSteps.find((step) => step.status === "running")?.title ?? "Waiting for the next trigger"}
+                    </div>
+                    <div className="workflow-feed">
+                      {workflowEvents.map((event) => (
+                        <div key={event.id} className={`workflow-line workflow-line-${event.tone}`}>
+                          <span className="workflow-bullet">{event.tone === "success" ? "OK" : ">"}</span>
+                          <span>{event.message}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </section>
+              ) : null}
 
               <section>
                 <div className="section-head">
@@ -389,7 +611,7 @@ export default function App() {
               <a>Tech</a>
             </nav>
             <div className="store-actions">
-              <button className="icon-bubble">{checkoutState ? "1" : "0"}</button>
+              <button className="icon-bubble" onClick={() => setCheckoutOpen(true)}>{cartItems.length}</button>
               <button className="signin-btn" onClick={() => setMode("owner")}>Back to HQ</button>
             </div>
           </header>
@@ -401,18 +623,26 @@ export default function App() {
               <p>{storefront.hero_product?.subtitle ?? "We watch TikTok, Instagram, and Chinese factory districts so you don't have to."}</p>
               <div className="store-cta-row">
                 <button className="store-btn primary" onClick={() => storefront.hero_product && handleCheckout(storefront.hero_product.id)}>
-                  {activeTask === `checkout-${storefront.hero_product?.id}` ? "Processing..." : "Buy demo product"}
+                  {activeTask === `checkout-${storefront.hero_product?.id}` ? "Processing..." : "Buy now"}
                 </button>
                 <button className="store-btn">{storefront.updated_label}</button>
               </div>
             </div>
             <div className="store-hero-media">
               <div className="creator-card tall">
-                <div className="media-placeholder" />
+                <img
+                  className="media-photo"
+                  src={getProductImage(storefront.hero_product?.product_name ?? "demo product")}
+                  alt={storefront.hero_product?.product_name ?? "Featured product"}
+                />
                 <div className="creator-tag">{storefront.hero_product?.badge ?? "Trending"} · ready to sell</div>
               </div>
               <div className="creator-card">
-                <div className="media-placeholder" />
+                <img
+                  className="media-photo"
+                  src="https://images.unsplash.com/photo-1511551203524-9a24350a5771?auto=format&fit=crop&w=900&q=80"
+                  alt="Factory sourced product lifestyle"
+                />
                 <div className="creator-tag">{storefront.hero_product?.source ?? "tiktok"} · factory direct</div>
               </div>
             </div>
@@ -444,7 +674,7 @@ export default function App() {
                 <article className="product-card" key={product.id}>
                   <div className={`product-media ${product.image_tone}`}>
                     <span className="product-tag">{product.badge}</span>
-                    <div className="media-placeholder" />
+                    <img className="product-photo" src={getProductImage(product.product_name)} alt={product.product_name} />
                   </div>
                   <div className="product-body">
                     <div className="product-name">{product.product_name}</div>
@@ -475,6 +705,7 @@ export default function App() {
               {INFLUENCER_CARDS.map((card) => (
                 <article className="influencer-card" key={card.handle}>
                   <div className={`influencer-video ${card.theme}`}>
+                    <img className="influencer-photo" src={getCreatorImage(INFLUENCER_CARDS.indexOf(card))} alt={card.handle} />
                     <span className="platform-chip">{card.platform.slice(0, 2).toUpperCase()}</span>
                     <div className="play-button">▶</div>
                     <div className="creator-footer">{card.handle}</div>
@@ -507,6 +738,83 @@ export default function App() {
               ))}
             </div>
           </section>
+
+          {checkoutOpen ? (
+            <div className="checkout-overlay" onClick={() => setCheckoutOpen(false)}>
+              <div className="checkout-drawer" onClick={(event) => event.stopPropagation()}>
+                <div className="checkout-head">
+                  <div>
+                    <div className="store-kicker">Checkout</div>
+                    <h3>{selectedCheckoutProduct?.product_name ?? "Your cart"}</h3>
+                  </div>
+                  <button className="checkout-close" onClick={() => setCheckoutOpen(false)}>x</button>
+                </div>
+
+                {selectedCheckoutProduct ? (
+                  <div className="checkout-line">
+                    <img className="checkout-thumb" src={getProductImage(selectedCheckoutProduct.product_name)} alt={selectedCheckoutProduct.product_name} />
+                    <div>
+                      <div className="checkout-item-name">{selectedCheckoutProduct.product_name}</div>
+                      <div className="checkout-item-meta">{selectedCheckoutProduct.subtitle}</div>
+                    </div>
+                    <strong>${selectedCheckoutProduct.price.toFixed(2)}</strong>
+                  </div>
+                ) : null}
+
+                <div className="checkout-grid">
+                  <label>
+                    Email
+                    <input value={checkoutForm.email} onChange={(event) => updateCheckoutField("email", event.target.value)} />
+                  </label>
+                  <label>
+                    Full name
+                    <input value={checkoutForm.fullName} onChange={(event) => updateCheckoutField("fullName", event.target.value)} />
+                  </label>
+                  <label className="span-2">
+                    Shipping address
+                    <input value={checkoutForm.address1} onChange={(event) => updateCheckoutField("address1", event.target.value)} />
+                  </label>
+                  <label>
+                    City
+                    <input value={checkoutForm.city} onChange={(event) => updateCheckoutField("city", event.target.value)} />
+                  </label>
+                  <label>
+                    State
+                    <input value={checkoutForm.state} onChange={(event) => updateCheckoutField("state", event.target.value)} />
+                  </label>
+                  <label>
+                    ZIP code
+                    <input value={checkoutForm.zip} onChange={(event) => updateCheckoutField("zip", event.target.value)} />
+                  </label>
+                  <label>
+                    Country
+                    <input value={checkoutForm.country} onChange={(event) => updateCheckoutField("country", event.target.value)} />
+                  </label>
+                  <label className="span-2">
+                    Card number
+                    <input value={checkoutForm.cardNumber} onChange={(event) => updateCheckoutField("cardNumber", event.target.value)} />
+                  </label>
+                  <label>
+                    Expiry
+                    <input value={checkoutForm.expiry} onChange={(event) => updateCheckoutField("expiry", event.target.value)} />
+                  </label>
+                  <label>
+                    CVC
+                    <input value={checkoutForm.cvc} onChange={(event) => updateCheckoutField("cvc", event.target.value)} />
+                  </label>
+                </div>
+
+                <div className="checkout-footer">
+                  <div className="checkout-total">
+                    Total <strong>${selectedCheckoutProduct?.price.toFixed(2) ?? "0.00"}</strong>
+                  </div>
+                  <button className="store-btn primary checkout-submit" onClick={submitCheckout}>
+                    {activeTask === `checkout-${selectedCheckoutProduct?.id}` ? "Processing..." : "Pay now"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
       )}
     </div>
