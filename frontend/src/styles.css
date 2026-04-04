@@ -1267,6 +1267,37 @@ a {
   font: inherit;
 }
 
+.floating-call-button {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  width: 68px;
+  height: 68px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #111111 0%, #2a2722 100%);
+  color: #fff6ec;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 16px 36px rgba(20, 16, 12, 0.22);
+  cursor: pointer;
+  z-index: 25;
+}
+
+.floating-call-button::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  border: 1px solid rgba(200, 117, 65, 0.26);
+}
+
+.floating-call-icon {
+  font-size: 28px;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
 @media (max-width: 1180px) {
   .owner-body {
     grid-template-columns: 1fr;
@@ -1344,5 +1375,12 @@ a {
   .checkout-grid label.span-2 {
     grid-template-columns: 1fr;
     grid-column: auto;
+  }
+
+  .floating-call-button {
+    right: 18px;
+    bottom: 18px;
+    width: 60px;
+    height: 60px;
   }
 }

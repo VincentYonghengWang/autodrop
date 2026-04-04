@@ -677,7 +677,6 @@ export default function App() {
               <a>Tech</a>
             </nav>
             <div className="store-actions">
-              <button className="icon-bubble" onClick={() => setVoiceOpen(true)}>☎</button>
               <button className="icon-bubble" onClick={() => setCheckoutOpen(true)}>{cartItems.length}</button>
               <button className="signin-btn" onClick={() => setMode("owner")}>Back to HQ</button>
             </div>
@@ -915,6 +914,15 @@ export default function App() {
               </div>
             </div>
           ) : null}
+
+          <button
+            className="floating-call-button"
+            onClick={() => setVoiceOpen(true)}
+            aria-label="Talk about products"
+            title="Talk about products"
+          >
+            <span className="floating-call-icon">✆</span>
+          </button>
         </div>
       )}
     </div>
