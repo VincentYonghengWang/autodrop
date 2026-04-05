@@ -61,17 +61,24 @@ CURATED_SIGNAL_QUEUE = [
 ]
 
 
+def _build_rotating_signal(existing_names: set[str]) -> dict:
+    unseen_signal = next((signal for signal in CURATED_SIGNAL_QUEUE if signal["product_name"] not in existing_names), None)
+    if unseen_signal:
+        return unseen_signal
+
+    existing_queue_names = [name for name in existing_names if any(name.startswith(item["product_name"]) for item in CURATED_SIGNAL_QUEUE)]
+    rotation_index = len(existing_queue_names) - len(CURATED_SIGNAL_QUEUE)
+    template = CURATED_SIGNAL_QUEUE[rotation_index % len(CURATED_SIGNAL_QUEUE)]
+    batch_number = rotation_index // len(CURATED_SIGNAL_QUEUE) + 2
+    variant = dict(template)
+    variant["product_name"] = f"{template['product_name']} Batch {batch_number}"
+    variant["raw_url"] = f"{template['raw_url']}?batch={batch_number}"
+    return variant
+
+
 def run(db: Session) -> dict:
     existing_names = set(db.scalars(select(TrendSignal.product_name)).all())
-    next_signal = next((signal for signal in CURATED_SIGNAL_QUEUE if signal["product_name"] not in existing_names), None)
-    if not next_signal:
-        log_activity(
-            db,
-            "Trend Radar",
-            "All curated trend slots are already live. The current product lineup remains active until the queue is refreshed.",
-            metadata={"queries": TREND_QUERIES, "queue_size": len(CURATED_SIGNAL_QUEUE)},
-        )
-        return {"inserted": 0, "sources": list(TREND_QUERIES), "skipped": True}
+    next_signal = _build_rotating_signal(existing_names)
 
     if next_signal["viral_score"] < settings.viral_score_threshold:
         log_activity(
